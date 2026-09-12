@@ -1,0 +1,13 @@
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 7,  name: 'opcode',     attr: ['7', 'L.JAL']},
+  {bits: 5,  name: 'rd',         attr: ['5', 'dest']},
+  {bits: 8,  name: 'imm[19:12]', attr: ['8', 'LJ-immediate[19:12]']},
+  {bits: 1,  name: '[11]',  attr: ['1', 'LJ-immediate[11]']},
+  {bits: 10, name: 'imm[10:1]',  attr: ['10', 'LJ-immediate[10:1]']},
+  {bits: 1,  name: '[20]',  attr: ['1', 'LJ-immediate[20]']},
+  {bits: 2, name: '00'},
+  {bits: 14, name: 'imm[34:21]',  attr: ['14', 'LJ-immediate[34:21]']},
+]}
+....
