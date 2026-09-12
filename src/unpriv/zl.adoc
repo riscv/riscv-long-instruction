@@ -1,0 +1,56 @@
+[[zl]]
+== Long Instruction Extensions
+
+
+RV32I and RV64I and all instructions based on them are encoded in the standard
+32-bit instruction format. The RISC-V Long Instruction extension provides a new
+instruction format that allows for 48-bit and 64-bit instructions. The extension
+is designed to allow for future expansion of the RISC-V instruction set, while
+maintaining compatibility with existing software and hardware.
+
+=== Long Instruction Encoding
+
+The instruction coding extends the ratified 32-bit and compressed 16-bit instruction format and requires ILEN=16. Each instruction is encoded in 16 bit parcels.
+
+include::images/bytefield/zl-encoding-scheme.edn[]
+
+The long instruction format adds new opcode spaces for each of the extended lengths.
+
+=== Base Instruction Formats
+
+include::images/wavedrom/zl-formats.edn[]
+
+=== Immediate Encoding Variants
+
+==== RV32I Immediate Encoding Variants
+
+include::images/wavedrom/zl-immediates32.edn[]
+
+==== RV64I Immediate Encoding Variants
+
+include::images/wavedrom/zl-immediates64.edn[]
+
+=== Instructions
+
+==== Integer Register-Immediate Instructions
+
+include::images/wavedrom/zl-li.edn[]
+[[zl-li]]
+
+==== Unconditional Jumps
+
+include::images/wavedrom/zl-jal.edn[]
+[[zl-jal]]
+
+include::images/wavedrom/zl-jalr.edn[]
+[[zl-jalr]]
+
+==== Conditional Branches
+
+include::images/wavedrom/zl-branches.edn[]
+[[zl-branches]]
+
+==== Load and Store Instructions
+
+include::images/wavedrom/zl-load-store.edn[]
+[[zl-load-store]]

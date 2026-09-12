@@ -1,0 +1,29 @@
+//
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 12, name: 'imm[11:0]'},
+  {bits: 14, name: 'imm[25:12]'},
+  {bits: 38, name: 'imm[25]'},
+], config: {label: {right: 'LI-immediate'}}}
+....
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 18, name: 'imm[17:0]'},
+  {bits: 14, name: 'imm[31:18]'},
+  {bits: 32, name: 'imm[31]'},
+], config: {label: {right: 'LU-immediate'}}}
+....
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 1, name: '0'},
+  {bits: 20, name: 'imm[20:1]'},
+  {bits: 14, name: 'imm[34:21]'},
+  {bits: 29, name: 'imm[34]'},
+], config: {label: {right: 'LJ-immediate'}}}
+....

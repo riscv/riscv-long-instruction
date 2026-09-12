@@ -1,0 +1,19 @@
+//FROM ## 2.4 Integer Computational Instructions
+//### Integer Register-Immediate Instructions
+//lui-aiupc-u-immed
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 7,  name: 'opcode',     attr: ['7', 'OP-LBRANCH', 'OP-LBRANCH', 'OP-LBRANCH', 'OP-LBRANCH']},
+  {bits: 1,  name: 'imm[11]',         attr: ['1', 'offset[11]', 'offset[11]', 'offset[11]', 'offset[11]']},
+  {bits: 4,  name: 'imm[4:1]',         attr: ['4', 'offset[4:1]', 'offset[4:1]', 'offset[4:1]', 'offset[4:1]']},
+  {bits: 3,  name: 'funct3',     attr: ['4', 'L.BEQ', 'L.BNE', 'L.BLT', 'L.BGE']},
+  {bits: 5,  name: 'rs1',        attr: ['5', 'rs1', 'rs1', 'rs1', 'rs1']},
+  {bits: 5,  name: 'rs2',        attr: ['5', 'rs2', 'rs2', 'rs2', 'rs2']},
+  {bits: 6,  name: 'imm[10:5]',  attr: ['7', 'offset[11:5]', 'offset[11:5]', 'offset[11:5]', 'offset[11:5]']},
+  {bits: 1,  name: 'imm[12]',    attr: ['1', 'offset[12]', 'offset[12]', 'offset[12]', 'offset[12]']},
+  {bits: 2,  name: '00',         attr: ['2', '0', '0', '0', '0']},
+  {bits: 14, name: 'imm[26:13]', attr: ['14', 'offset[25:12]', 'offset[25:12]', 'offset[25:12]', 'offset[25:12]']},
+]}
+....

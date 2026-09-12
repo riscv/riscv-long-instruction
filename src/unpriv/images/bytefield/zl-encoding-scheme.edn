@@ -1,0 +1,55 @@
+[bytefield]
+----
+(defattrs :plain [:plain {:font-family "M+ 1p Fallback" :font-size 42}])
+(def row-height 50)
+(def row-header-fn nil)
+(def boxes-per-row 80)
+
+
+(draw-box "63" {:span 4 :text-anchor "start" :borders {}})
+(draw-box "Parcel D" {:span 8 :borders {}})
+(draw-box "48" {:span 4 :text-anchor "end" :borders {}})
+(draw-box "47" {:span 4 :text-anchor "start" :borders {}})
+(draw-box "Parcel C" {:span 8 :borders {}})
+(draw-box "32" {:span 4 :text-anchor "end" :borders {}})
+(draw-box "31" {:span 4 :text-anchor "start" :borders {}})
+(draw-box "Parcel B" {:span 8 :borders {}})
+(draw-box "16" {:span 4 :text-anchor "end" :borders {}})
+(draw-box "15" {:span 4 :text-anchor "start" :borders {}})
+(draw-box "Parcel A" {:span 8 :borders {}})
+(draw-box "0" {:span 4 :text-anchor "end" :borders {}})
+(draw-box "" {:span 16 :borders {} })
+
+(draw-box "" {:span 80 :borders {}})
+
+(draw-box "" {:span 48 :borders {}})
+(draw-box "payload" {:span 14})
+(draw-box "!=11" {:span 2})
+(draw-box "16b" {:span 16 :borders {} :text-anchor "start"})
+
+(draw-box "" {:span 80 :borders {}})
+
+(draw-box "" {:span 32 :borders {}})
+(draw-box "payload" {:span 27})
+(draw-box "!=111" {:span 3})
+(draw-box "11" {:span 2})
+(draw-box "32b" {:span 16 :borders {} :text-anchor "start"})
+
+(draw-box "" {:span 80 :borders {}})
+
+(draw-box "" {:span 16 :borders {}})
+(draw-box "payload" {:span 14})
+(draw-box "!=11" {:span 2})
+(draw-box "payload" {:span 27})
+(draw-box "11111" {:span 5})
+(draw-box "48b" {:span 16 :borders {} :text-anchor "start"})
+
+(draw-box "" {:span 80 :borders {}})
+
+(draw-box "payload" {:span 27})
+(draw-box "!=111" {:span 3})
+(draw-box "11" {:span 2})
+(draw-box "payload" {:span 27})
+(draw-box "11111" {:span 5})
+(draw-box "64b" {:span 16 :borders {} :text-anchor "start"})
+----
