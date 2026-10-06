@@ -51,10 +51,35 @@ include::images/wavedrom/zl-immediates64.edn[]
 
 ==== Integer Register-Immediate Instructions
 
+The following instructions can be used to form constants as well as addresses relative to the PC.
+
 include::images/wavedrom/zl-li.edn[]
 [[zl-li]]
 
-==== Unconditional Jumps
+LI is defined for both RV32I and RV64I and loads the destination register with the immediate value, while zeroing the upper bits of the destination register in RV64I. LUI is only defined for RV64I and loads the upper 32 bits of the destination register with the immediate value, keeping the remainig bits of the destination register unchanged.
+
+Similarly, AUIPC is only defined for RV64I and adds the immediate value to the current PC and stores the result in the destination register.
+
+[NOTE]
+====
+The instructions replace longer sequeunces of instructions.
+
+In RV32I:
+- <= 12 bit: addi (4B instruction)
+- only upper 20 bit: lui (4B instruction)
+- else: l.li (6B instruction) vs. lui (4B instruction) + addi (4B instruction)
+
+In RV64I:
+- <= 12 bit: addiw (4B instruction)
+- only upper 20 bit: lui (4B instruction)
+- <= 32 bit: l.li (6B instruction) vs. lui (4B instruction) + addiw (4B instruction)
+- else: l.li + l.lui (12B) vs. lui + addiw + 3*(slli+aadi) (total: 32B)
+====
+
+[NOTE]
+====
+Those instructions use up one entire OPCODE, out of 12. A 64 bit instruction might be better used, depending on the occurences of the instructions in real code. The instruction might be used to load a 32 bit constant into a register, but it might be better to use a 64 bit instruction to load a 64 bit constant into a register, if the occurences of the latter are higher.
+====
 
 include::images/wavedrom/zl-jal.edn[]
 [[zl-jal]]
