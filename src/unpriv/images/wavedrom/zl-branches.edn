@@ -7,13 +7,13 @@
 {reg: [
   {bits: 5,  name: '11111',      attr: ['5', '']},
   {bits: 2,  name: 'op',         attr: ['2', 'OP']},
-  {bits: 1,  name: 'imm[11]',    attr: ['1', 'offset[11]', 'offset[11]', 'offset[11]', 'offset[11]']},
+  {bits: 1,  name: 'imm[11]',    attr: ['1', '', '', '', '']},
   {bits: 4,  name: 'imm[4:1]',   attr: ['4', 'offset[4:1]', 'offset[4:1]', 'offset[4:1]', 'offset[4:1]']},
   {bits: 3,  name: 'funct3',     attr: ['3', 'L.BEQ/L.BNE', 'L.BLT[U]', 'L.BGE[U]']},
   {bits: 5,  name: 'rs1',        attr: ['5', 'rs1', 'rs1', 'rs1', 'rs1']},
   {bits: 5,  name: 'rs2',        attr: ['5', 'rs2', 'rs2', 'rs2', 'rs2']},
   {bits: 6,  name: 'imm[10:5]',  attr: ['7', 'offset[11:5]', 'offset[11:5]', 'offset[11:5]', 'offset[11:5]']},
-  {bits: 1,  name: 'imm[12]',    attr: ['1', 'offset[12]', 'offset[12]', 'offset[12]', 'offset[12]']},
+  {bits: 1,  name: 'imm[12]',    attr: ['1', '', '', '', '']},
   {bits: 2,  name: 'op',         attr: ['2', 'OP', 'OP', 'OP', 'OP']},
   {bits: 14, name: 'imm[26:13]', attr: ['14', 'offset[25:12]', 'offset[25:12]', 'offset[25:12]', 'offset[25:12]']},
 ], config: {fontsize: 11 }}
