@@ -71,14 +71,21 @@ In RV64I: up to 12 bit: addiw (4B instruction); only upper 20 bit: lui (4B instr
 
 [NOTE]
 ====
-Those instructions use up one entire OPCODE, out of 12. A 64 bit instruction might be better used, depending on the occurences of the instructions in real code. The instruction might be used to load a 32 bit constant into a register, but it might be better to use a 64 bit instruction to load a 64 bit constant into a register, if the occurences of the latter are higher.
+Those instructions use up one entire OPCODE, out of 12. A 64 bit instruction might be better used, depending on the occurences of the instructions in real code.
 ====
+
+==== Unconditional Jumps
 
 include::images/wavedrom/zl-jal.edn[]
 [[zl-jal]]
 
 include::images/wavedrom/zl-jalr.edn[]
 [[zl-jalr]]
+
+[NOTE]
+====
+The instructions use up one entire OPCODE, out of 12. The range is also rather large. Ideas: Redefine part to a function field and add variants of using the immediate (e.g., virtual functions).
+====
 
 ==== Conditional Branches
 
