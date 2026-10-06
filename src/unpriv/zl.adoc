@@ -64,16 +64,9 @@ Similarly, AUIPC is only defined for RV64I and adds the immediate value to the c
 ====
 The instructions replace longer sequeunces of instructions.
 
-In RV32I:
-- <= 12 bit: addi (4B instruction)
-- only upper 20 bit: lui (4B instruction)
-- else: l.li (6B instruction) vs. lui (4B instruction) + addi (4B instruction)
+In RV32I: up to 12 bit: addi (4B instruction); only upper 20 bit: lui (4B instruction); else: l.li (6B instruction) vs. lui (4B instruction) + addi (4B instruction)
 
-In RV64I:
-- <= 12 bit: addiw (4B instruction)
-- only upper 20 bit: lui (4B instruction)
-- <= 32 bit: l.li (6B instruction) vs. lui (4B instruction) + addiw (4B instruction)
-- else: l.li + l.lui (12B) vs. lui + addiw + 3*(slli+aadi) (total: 32B)
+In RV64I: up to 12 bit: addiw (4B instruction); only upper 20 bit: lui (4B instruction); up to 32 bit: l.li (6B instruction) vs. lui (4B instruction) + addiw (4B instruction); else: l.li + l.lui (12B) vs. lui + addiw + 3*(slli+aadi) (total: 32B)
 ====
 
 [NOTE]
