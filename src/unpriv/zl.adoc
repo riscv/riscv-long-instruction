@@ -19,11 +19,25 @@ The long instruction format adds new opcode spaces for each of the extended leng
  - Bit 5 and 6 of the first parcel can be arbitrary values. This part of the opcode should be used to indicate information on the type of instruction to support pipelines that did not fetch the full word. For example control flow instructions should be easy to identify.
  - Bit 0 and 1 of the third parcel can be all values except 11.
 
+[NOTE]
+====
+Out of the 12 opcodes, 2 should be reserved for custom instructions. An assignment of the opcoce space is tbd.
+====
+
 === Base Instruction Formats
+
+Additional instruction formats are defined for 48-bit instructions:
 
 include::images/wavedrom/zl-formats.edn[]
 
+[NOTE]
+====
+Those are basically just the extensions of the existing formats. Based on the included instructions and as a reference for future optional extensions, more formats will be defined.
+====
+
 === Immediate Encoding Variants
+
+The immediate encoding variants are defined for the base instruction formats. It maps the immediate values from the instruction formats to the immediate values used in the instruction semantics (sign extension).
 
 ==== RV32I Immediate Encoding Variants
 
