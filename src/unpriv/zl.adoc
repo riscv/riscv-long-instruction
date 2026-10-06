@@ -92,7 +92,14 @@ The instructions use up one entire OPCODE, out of 12. The range is also rather l
 include::images/wavedrom/zl-branches.edn[]
 [[zl-branches]]
 
+[NOTE]
+====
+A range of 1M is large enough probably, so that we can make use of the opcode space in other ways.
+====
+
 ==== Load and Store Instructions
 
 include::images/wavedrom/zl-load-store.edn[]
 [[zl-load-store]]
+
+l.load and l.store allow for rd +/- 16M accesses.
