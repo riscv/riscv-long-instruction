@@ -3,12 +3,13 @@
 [wavedrom, ,svg]
 ....
 {reg: [
-  {bits: 7,  name: 'opcode'},
+  {bits: 5,  name: '11111'},
+  {bits: 2,  name: 'op'},
   {bits: 5,  name: 'rd'},
   {bits: 3,  name: 'funct3'},
   {bits: 5,  name: 'rs1'},
   {bits: 12, name: 'imm[11:0]'},
-  {bits: 2,  name: '00'},
+  {bits: 2,  name: 'op'},
   {bits: 14, name: 'imm[25:12]'},
 ], config: {label: {right: 'LI-type'}}}
 ....
@@ -16,10 +17,12 @@
 [wavedrom, ,svg]
 ....
 {reg: [
-  {bits: 7,  name: 'opcode'},
+  {bits: 5,  name: '11111'},
+  {bits: 2,  name: 'op'},
   {bits: 5,  name: 'rd'},
   {bits: 20, name: 'imm[31:12]'},
-  {bits: 4, name: 'f4'},
+  {bits: 2, name: 'op'},
+  {bits: 2, name: 'f2'},
   {bits: 12, name: 'imm[11:0]'},
 ], config: {label: {right: 'LU-type'}}}
 ....
@@ -27,13 +30,14 @@
 [wavedrom, ,svg]
 ....
 {reg: [
-  {bits: 7,  name: 'opcode'},
+  {bits: 5,  name: '11111'},
+  {bits: 2,  name: 'op'},
   {bits: 5,  name: 'rd'},
   {bits: 8,  name: 'imm[19:12]'},
   {bits: 1,  name: '[11]'},
   {bits: 10, name: 'imm[10:1]'},
   {bits: 1,  name: '[20]'},
-  {bits: 2, name: 'f2'},
+  {bits: 2, name: 'op'},
   {bits: 14, name: 'imm[34:21]'},
 ], config: {label: {right: 'LJ-type'}}}
 ....
@@ -41,7 +45,8 @@
 [wavedrom, ,svg]
 ....
 {reg: [
-  {bits: 7,  name: 'opcode'},
+  {bits: 5,  name: '11111'},
+  {bits: 2,  name: 'op'},
   {bits: 1,  name: '[11]'},
   {bits: 4,  name: 'imm[4:1]'},
   {bits: 3,  name: 'funct3'},
@@ -49,7 +54,7 @@
   {bits: 5,  name: 'rs2'},
   {bits: 6,  name: 'imm[10:5]'},
   {bits: 1,  name: '[12]'},
-  {bits: 2, name: 'f2'},
+  {bits: 2, name: 'op'},
   {bits: 14, name: 'imm[26:13]'},
 ], config: {fontsize: 12, label: {right: 'LB-Type'}}}
 ....
