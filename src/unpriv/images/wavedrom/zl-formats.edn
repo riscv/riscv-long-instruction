@@ -36,9 +36,9 @@
   {bits: 8,  name: 'imm[19:12]'},
   {bits: 1,  name: '[11]'},
   {bits: 10, name: 'imm[10:1]'},
-  {bits: 1,  name: '[20]'},
+  {bits: 1,  name: '[34]'},
   {bits: 2, name: 'op'},
-  {bits: 14, name: 'imm[34:21]'},
+  {bits: 14, name: 'imm[33:20]'},
 ], config: {fontsize: 11, label: {right: 'LJ-type'}}}
 ....
 
@@ -53,8 +53,8 @@
   {bits: 5,  name: 'rs1'},
   {bits: 5,  name: 'rs2'},
   {bits: 6,  name: 'imm[10:5]'},
-  {bits: 1,  name: '[12]'},
+  {bits: 1,  name: '[26]'},
   {bits: 2, name: 'op'},
-  {bits: 14, name: 'imm[26:13]'},
+  {bits: 14, name: 'imm[25:12]'},
 ], config: {fontsize: 11, label: {right: 'LB-Type'}}}
 ....
