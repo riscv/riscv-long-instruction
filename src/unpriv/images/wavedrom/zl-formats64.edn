@@ -1,0 +1,130 @@
+//Zl long instruction encodings (generated layout, see zl.adoc).
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 5, name: '11111'},
+  {bits: 2, name: 'op'},
+  {bits: 5, name: 'rd'},
+  {bits: 3, name: 'funct3'},
+  {bits: 5, name: 'rs1'},
+  {bits: 11, name: 'imm[10:0]'},
+  {bits: 1, name: '[38]'},
+  {bits: 2, name: '11'},
+  {bits: 3, name: 'op'},
+  {bits: 27, name: 'imm[37:11]'},
+], config: {lanes: 2, fontsize: 11, label: {right: 'L4I-type'}}}
+....
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 5, name: '11111'},
+  {bits: 2, name: 'op'},
+  {bits: 5, name: 'rd'},
+  {bits: 19, name: 'imm[30:12]'},
+  {bits: 1, name: '[45]'},
+  {bits: 2, name: '11'},
+  {bits: 3, name: 'op'},
+  {bits: 1, name: 'f1'},
+  {bits: 12, name: 'imm[11:0]'},
+  {bits: 14, name: 'imm[44:31]'},
+], config: {lanes: 2, fontsize: 11, label: {right: 'L4U-type'}}}
+....
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 5, name: '11111'},
+  {bits: 2, name: 'op'},
+  {bits: 5, name: 'rd'},
+  {bits: 8, name: 'off[19:12]'},
+  {bits: 1, name: '[11]'},
+  {bits: 10, name: 'off[10:1]'},
+  {bits: 1, name: '[47]'},
+  {bits: 2, name: '11'},
+  {bits: 3, name: 'op'},
+  {bits: 27, name: 'off[46:20]'},
+], config: {lanes: 2, fontsize: 11, label: {right: 'L4J-type'}}}
+....
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 5, name: '11111'},
+  {bits: 2, name: 'op'},
+  {bits: 1, name: '[11]'},
+  {bits: 4, name: 'off[4:1]'},
+  {bits: 3, name: 'funct3'},
+  {bits: 5, name: 'rs1'},
+  {bits: 11, name: 'imm[10:0]'},
+  {bits: 1, name: '[20]'},
+  {bits: 2, name: '11'},
+  {bits: 3, name: 'op'},
+  {bits: 6, name: 'off[10:5]'},
+  {bits: 8, name: 'off[19:12]'},
+  {bits: 13, name: 'imm[23:11]'},
+], config: {lanes: 2, fontsize: 11, label: {right: 'L4BI-type'}}}
+....
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 5, name: '11111'},
+  {bits: 2, name: 'op'},
+  {bits: 1, name: '[11]'},
+  {bits: 4, name: 'off[4:1]'},
+  {bits: 3, name: 'funct3'},
+  {bits: 5, name: 'rs1'},
+  {bits: 11, name: 'imm[10:0]'},
+  {bits: 1, name: '[20]'},
+  {bits: 2, name: '11'},
+  {bits: 3, name: 'op'},
+  {bits: 6, name: 'off[10:5]'},
+  {bits: 8, name: 'off[19:12]'},
+  {bits: 6, name: 'pos'},
+  {bits: 6, name: 'len-1'},
+  {bits: 1, name: '[11]'},
+], config: {lanes: 2, fontsize: 11, label: {right: 'L4BF-type'}}}
+....
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 5, name: '11111'},
+  {bits: 2, name: 'op'},
+  {bits: 1, name: '[11]'},
+  {bits: 4, name: 'off[4:1]'},
+  {bits: 3, name: 'funct3'},
+  {bits: 5, name: 'rs1'},
+  {bits: 11, name: 'lo[10:0]'},
+  {bits: 1, name: '[20]'},
+  {bits: 2, name: '11'},
+  {bits: 3, name: 'op'},
+  {bits: 6, name: 'off[10:5]'},
+  {bits: 8, name: 'off[19:12]'},
+  {bits: 8, name: 'hi-lo'},
+  {bits: 5, name: 'lo[15:11]'},
+], config: {lanes: 2, fontsize: 11, label: {right: 'L4BR-type'}}}
+....
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 5, name: '11111'},
+  {bits: 2, name: 'op'},
+  {bits: 1, name: '[11]'},
+  {bits: 4, name: 'off[4:1]'},
+  {bits: 3, name: 'funct3'},
+  {bits: 5, name: 'rs1'},
+  {bits: 11, name: 'bias[10:0]'},
+  {bits: 1, name: '[20]'},
+  {bits: 2, name: '11'},
+  {bits: 3, name: 'op'},
+  {bits: 6, name: 'off[10:5]'},
+  {bits: 8, name: 'off[19:12]'},
+  {bits: 2, name: 'es'},
+  {bits: 10, name: 'bound'},
+  {bits: 1, name: '[11]'},
+], config: {lanes: 2, fontsize: 11, label: {right: 'L4BT-type'}}}
+....

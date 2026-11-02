@@ -153,6 +153,7 @@ REQUIRES := --require=asciidoctor-bibtex \
 
 .PHONY: all build clean clean-diagram-cache build-pdf build-html build-epub build-tags docker-pull-latest
 .PHONY: build-norm-rules build-norm-rules-json build-norm-rules-html check-xref-fallbacks build-changebar-pdf
+.PHONY: zl zl-pdf zl-html
 
 all: build
 
@@ -187,6 +188,17 @@ build-norm-rules-json: $(NORM_RULES_JSON)
 build-norm-rules-html: $(NORM_RULES_HTML)
 build-norm-rules: build-norm-rules-json build-norm-rules-html
 build: build-pdf build-html build-epub build-tags build-norm-rules-json build-norm-rules-html
+
+# Zl draft: a small standalone document built from src/unpriv/zl.adoc.
+# Only builds PDF and HTML, which is much faster than the full manual.
+# Use `make -j2 zl` to build both formats in parallel.
+ZL_DOC := zl-draft
+zl: zl-pdf zl-html
+zl-pdf: $(BUILD_DIR)/$(ZL_DOC).pdf
+zl-html: $(BUILD_DIR)/$(ZL_DOC).html
+# The draft has no bibliography, Sail snippets or lists of tables/figures,
+# so only load the diagram extension.
+$(BUILD_DIR)/$(ZL_DOC).pdf $(BUILD_DIR)/$(ZL_DOC).html: REQUIRES := --require=asciidoctor-diagram
 
 ALL_SRCS := $(shell git ls-files $(SRC_DIR))
 

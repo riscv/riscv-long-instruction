@@ -1,0 +1,33 @@
+= RISC-V Long Instruction Extensions (Zl)
+:doctype: article
+:description: Draft of the RISC-V Long Instruction Extensions
+:imagesdir: images
+:title-logo-image: image:risc-v_logo.svg["RISC-V International Logo",pdfwidth=3.25in,align=center]
+ifdef::draft-watermark[]
+:page-background-image: image:draft.svg[opacity=20%]
+endif::[]
+:experimental:
+:reproducible:
+:imagesoutdir: {docdir}/../build/images-out
+// Default output format for asciidoctor-diagram blocks (wavedrom, etc.) that do
+// not specify one; without it wavedrom would fall back to PNG.
+:diagram-format: svg
+:icons: font
+:lang: en
+:sectnums:
+:sectnumlevels: 4
+:sectlinks:
+:toc: left
+:toclevels: 3
+:source-highlighter: rouge
+:table-caption: Table
+:figure-caption: Figure
+:xrefstyle: short
+:section-refsig: Section
+:data-uri:
+:hide-uri-scheme:
+:footnote:
+
+// The content is single-sourced from the ISA manual chapter.
+:imagesdir: unpriv/images
+include::unpriv/zl.adoc[]

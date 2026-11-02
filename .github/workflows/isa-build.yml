@@ -156,6 +156,52 @@ jobs:
           path: ${{ github.workspace }}/build/norm-rules.json
           retention-days: 7
 
+  # Build the standalone Zl draft (src/zl-draft.adoc) as PDF and HTML. It is small,
+  # so it runs in its own job, in parallel with the full manual. Its outputs are
+  # released and deployed to GitHub Pages under snapshot/zl/.
+  build-zl:
+    name: Build Zl draft
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Set short SHA
+        run: echo "SHORT_SHA=$(echo ${GITHUB_SHA::7})" >> $GITHUB_ENV
+
+      - name: Cache rendered diagrams
+        uses: actions/cache@v6
+        with:
+          path: .diagram-cache
+          key: isa-diagrams-zl-${{ hashFiles('src/**') }}
+          restore-keys: isa-diagrams-zl-
+
+      - name: Pull build container
+        run: make docker-pull-latest
+
+      - name: Build Zl draft
+        id: build_files
+        run: make -j2 zl
+
+      - name: Upload zl-draft.pdf
+        if: steps.build_files.outcome == 'success'
+        uses: actions/upload-artifact@v7
+        with:
+          name: zl-draft-${{ env.SHORT_SHA }}.pdf
+          path: ${{ github.workspace }}/build/zl-draft.pdf
+          retention-days: 7
+
+      - name: Upload zl-draft.html
+        if: steps.build_files.outcome == 'success'
+        uses: actions/upload-artifact@v7
+        with:
+          name: zl-draft-${{ env.SHORT_SHA }}.html
+          path: ${{ github.workspace }}/build/zl-draft.html
+          retention-days: 7
+
   # Branch protection on main requires a status check named "build". This job keeps
   # that name and passes only when both build jobs succeeded. It runs even when one
   # of them fails, because a skipped required check counts as passing.
@@ -215,11 +261,11 @@ jobs:
           path: ${{ github.workspace }}/build/riscv-spec.pdf
           retention-days: 7
 
-  # Create the release and the GitHub Pages content from the outputs of both build jobs.
+  # Create the release and the GitHub Pages content from the outputs of the build jobs.
   publish:
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
 
-    needs: [build-pdf, build-html]
+    needs: [build-pdf, build-html, build-zl]
 
     runs-on: ubuntu-latest
 
@@ -257,6 +303,8 @@ jobs:
             ${{ github.workspace }}/build/riscv-spec.epub
             ${{ github.workspace }}/build/norm-rules.html
             ${{ github.workspace }}/build/norm-rules.json
+            ${{ github.workspace }}/build/zl-draft.pdf
+            ${{ github.workspace }}/build/zl-draft.html
         env:
           GITHUB_TOKEN: ${{ secrets.GHTOKEN }}
 
@@ -271,6 +319,9 @@ jobs:
           cp build/norm-rules.html dist/snapshot/norm-rules/norm-rules.html
           cp build/norm-rules.json dist/snapshot/norm-rules/norm-rules.json
           cp build/riscv-spec.html dist/snapshot/norm-rules/riscv-spec.html
+          mkdir -p dist/snapshot/zl
+          cp build/zl-draft.html dist/snapshot/zl/index.html
+          cp build/zl-draft.pdf dist/snapshot/zl/zl-draft.pdf
           # Add root redirect
           printf '<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="utf-8">\n  <meta http-equiv="refresh" content="0; url=snapshot/spec/">\n  <link rel="canonical" href="snapshot/spec/">\n  <title>RISC-V ISA Manual</title>\n</head>\n<body>\n  <p>Redirecting to <a href="snapshot/spec/">RISC-V ISA Manual</a>…</p>\n</body>\n</html>\n' > dist/index.html
 

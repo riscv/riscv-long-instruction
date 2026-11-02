@@ -1,16 +1,14 @@
-//FROM ## 2.4 Integer Computational Instructions
-//### Integer Register-Immediate Instructions
-//lui-aiupc-u-immed
+//Zl long instruction encodings (generated layout, see zl.adoc).
 
 [wavedrom, ,svg]
 ....
 {reg: [
-  {bits: 5,  name: '11111',     attr: ['7', '', '', '', '']},
-  {bits: 2,  name: 'op',         attr: ['2', 'OP', 'OP', 'OP', 'OP']},
-  {bits: 5,  name: 'rd',         attr: ['5', 'dest', 'dest', 'dest', 'dest']},
-  {bits: 20, name: 'imm[31:12]', attr: ['20', 'LU-immediate[31:12]', 'LU-immediate[31:12]', 'LU-immediate[31:12]', 'LU-immediate[31:12]']},
-  {bits: 2,  name: 'op',         attr: ['2', 'OP', 'OP', 'OP', 'OP']},
-  {bits: 2,  name: 'f4',         attr: ['2', 'L.LI', 'L.LUI', 'L.AIPC', 'L.AUIPC']},
-  {bits: 12, name: 'imm[11:0]',  attr: ['12', 'LU-immediate[11:0]', 'LU-immediate[11:0]', 'LU-immediate[11:0]', 'LU-immediate[11:0]']}
-], config: {fontsize: 11 }}
+  {bits: 5, name: '11111'},
+  {bits: 2, name: 'op', attr: ['2', 'LI', 'LI', 'LI', 'LI']},
+  {bits: 5, name: 'rd'},
+  {bits: 20, name: 'imm[31:12]', attr: ['20', 'imm[31:12]', 'imm[63:44]', 'imm[31:12]', 'imm[63:44]']},
+  {bits: 2, name: 'op', attr: ['2', 'LI', 'LI', 'LI', 'LI']},
+  {bits: 2, name: 'f2', attr: ['2', 'L.LI', 'L.LUI', 'L.AIPC', 'L.AUIPC']},
+  {bits: 12, name: 'imm[11:0]'},
+], config: {fontsize: 11}}
 ....

@@ -1,100 +1,473 @@
 [[zl]]
 == Long Instruction Extensions
 
+RV32I, RV64I and their extensions use 32-bit instructions and, with C, 16-bit instructions.
+The Long Instruction extensions (Zl) add 48-bit and 64-bit instructions.
 
-RV32I and RV64I and all instructions based on them are encoded in the standard
-32-bit instruction format. The RISC-V Long Instruction extension provides a new
-instruction format that allows for 48-bit and 64-bit instructions. The extension
-is designed to allow for future expansion of the RISC-V instruction set, while
-maintaining compatibility with existing software and hardware.
+=== Rationale
 
-=== Long Instruction Encoding
+- The 32-bit encoding space is filling up as more extensions get ratified.
+- 12- and 20-bit immediates lead to sequences of up to eight instructions; one longer instruction is often smaller.
+- Long instructions avoid temporary registers for intermediate values.
 
-The instruction coding extends the ratified 32-bit and compressed 16-bit instruction format and requires ILEN=16. Each instruction is encoded in 16 bit parcels.
+=== Compiler and Linker Usage
 
-include::images/bytefield/zl-encoding-scheme.edn[]
+For the design of instructions, some constraints of compiler and linker need to be considered:
 
-The long instruction format adds new opcode spaces for each of the extended lengths. For 48-bit instructions, the opcode space of a total of 12 opcodesis defined by:
-
- - Bit 5 and 6 of the first parcel can be arbitrary values. This part of the opcode should be used to indicate information on the type of instruction to support pipelines that did not fetch the full word. For example control flow instructions should be easy to identify.
- - Bit 0 and 1 of the third parcel can be all values except 11.
+* Compilers lower to instructions whose immediates are guaranteed to fit: symbol offsets, distances and constants are often unknown at compile time. Such lowering needs the 64-bit (or even longer) forms, which cover the full code model.
+* For symbol references, the 48-bit forms result from linker relaxation (64-bit → 48-bit when the value fits); this also holds for static linking and LTO, because code is generated before the final layout. Hand-written and custom code may use them freely.
+* Compilers emit 48-bit forms directly for known values (constants, MMIO addresses, stack and struct offsets), for branches within a function (resolved by the assembler), when a code model guarantees the range (e.g. ±512{nbsp}MiB), and in JIT compilers, which know the final addresses.
+* Every 48-bit instruction should therefore have a 64-bit counterpart with the same semantics and a wider immediate or offset, so the linker can relax it.
 
 [NOTE]
 ====
-Out of the 12 opcodes, 2 should be reserved for custom instructions. An assignment of the opcoce space is tbd.
+Not all 64-bit counterparts are defined yet: register-register branches, OP-IMM, loads/stores (base- and PC-relative) and L.JALR are open.
+Full 64-bit constants may even need longer than 64-bit instructions (see <<zl-li64>>).
+====
+
+=== Long Instruction Encoding
+
+Instructions consist of 16-bit parcels A (inst[15:0]) to D (inst[63:48]). Zl requires IALIGN=16 and ILEN≥48 (≥64 with 64-bit instructions).
+
+include::images/bytefield/zl-encoding-scheme.edn[]
+
+* 48-bit: inst[4:0]=`11111`, inst[33:32]≠`11`. inst[6:5] and inst[33:32] select one of 12 major opcodes; 39 payload bits.
+* 64-bit: inst[4:0]=`11111`, inst[33:32]=`11`, inst[36:34]≠`111`. inst[6:5] and inst[36:34] select one of 28 major opcodes; 52 payload bits.
+
+inst[6:5] is in the first parcel and groups the major opcodes so that a front end can classify an instruction before it has all parcels.
+The same grouping applies to both lengths:
+
+[%autowidth,options="header"]
+|===
+|inst[6:5] |48-bit, inst[33:32] = 00 / 01 / 10 |64-bit, inst[36:34] = 000…110
+|00 |LI / OP-IMM / _reserved_ |000: LI64, others _reserved_
+|01 |LOAD / STORE / LS-PC |all _reserved_
+|10 |all _custom_ |all _custom_
+|11 (control flow) |JUMP / BRANCH / BRANCH-IMM |000: JUMP64, 001: BRANCH-IMM64, 010: BRANCH-EXT64, others _reserved_
+|===
+
+[NOTE]
+====
+Reserving one inst[6:5] group gives 25% of each opcode space for custom instructions, as proposed in the task group.
+Whether to allocate custom space before the formats are settled is still open. All opcode values are tentative.
 ====
 
 === Base Instruction Formats
 
-Additional instruction formats are defined for 48-bit instructions:
+The formats extend the 32-bit formats: rd, funct3, rs1 and rs2 stay in place, and the low immediate bits keep their 32-bit positions.
+The sign bit is always inst[31]: of the branch offset in branch formats, of the immediate in all others. Sign extension therefore does not depend on format or length.
+Additional immediate bits are placed in parcels C and D.
 
-include::images/wavedrom/zl-formats.edn[]
+48-bit formats:
+
+include::images/wavedrom/zl-formats48.edn[]
+
+64-bit formats:
+
+include::images/wavedrom/zl-formats64.edn[]
 
 [NOTE]
 ====
-Those are basically just the extensions of the existing formats. Based on the included instructions and as a reference for future optional extensions, more formats will be defined.
+Fixing the sign bit at inst[31] keeps the hardware simple; software does not care how the remaining bits are swizzled.
 ====
 
 === Immediate Encoding Variants
 
-The immediate encoding variants are defined for the base instruction formats. It maps the immediate values from the instruction formats to the immediate values used in the instruction semantics (sign extension).
+Immediates are assembled from these instruction bits and sign-extended from inst[31].
+The other branch formats spread their offset like L3B, see the format figures.
 
-==== RV32I Immediate Encoding Variants
+==== RV32
 
 include::images/wavedrom/zl-immediates32.edn[]
 
-==== RV64I Immediate Encoding Variants
+==== RV64
 
 include::images/wavedrom/zl-immediates64.edn[]
 
 === Instructions
 
-==== Integer Register-Immediate Instructions
-
-The following instructions can be used to form constants as well as addresses relative to the PC.
+==== Constants and PC-Relative Addresses
 
 include::images/wavedrom/zl-li.edn[]
 [[zl-li]]
 
-LI is defined for both RV32I and RV64I and loads the destination register with the immediate value, while zeroing the upper bits of the destination register in RV64I. LUI is only defined for RV64I and loads the upper 32 bits of the destination register with the immediate value, keeping the remainig bits of the destination register unchanged.
+* L.LI rd, imm: `rd = sext(imm[31:0])`.
+* L.AIPC rd, imm: `rd = pc + sext(imm[31:0])`.
+* L.LUI rd, imm (RV64): `rd[63:32] = imm`, rd[31:0] unchanged.
+* L.AUIPC rd, imm (RV64): `rd = rd + (imm << 32)`; completes a 64-bit PC-relative address after L.AIPC.
 
-Similarly, AUIPC is only defined for RV64I and adds the immediate value to the current PC and stores the result in the destination register.
+L.LUI and L.AUIPC are reserved on RV32.
+
+[source,asm]
+----
+lui    a0, %hi(sym)      # 8 B
+addi   a0, a0, %lo(sym)
+l.li   a0, sym           # 6 B
+
+1: auipc a0, %pcrel_hi(sym)  # 8 B (medany)
+addi   a0, a0, %pcrel_lo(1b)
+l.aipc a0, sym           # 6 B
+
+li     a0, 0x123456789abcdef0   # RV64: up to 8 instructions, ≤ 32 B
+l.li   a0, 0x9abcdef0    # 12 B
+l.lui  a0, 0x12345678
+----
+
+===== L.AUIPC Usage
+
+L.AUIPC adds to bits 63:32. Together with L.AIPC it forms any 64-bit PC-relative address without a load or a temporary.
+As with `%pcrel_hi`, the upper part compensates for the sign-extended lower part: `hi = (off - sext(lo)) >> 32`.
+
+[source,asm]
+----
+# sym = pc + 0x1_2345_6789 (4.5 GiB away, large/PIC code model)
+1: auipc a0, %pcrel_hi(.LC0)    # 8 B + 8 B pool entry, one load;
+ld     a0, %pcrel_lo(1b)(a0)    # in PIC the entry needs a dynamic relocation
+
+1: auipc a0, 0                  # 18 B, 1 temporary
+lui    a5, 0x12345              # a5 = 0x1_2345_6789
+addiw  a5, a5, 0x678
+c.slli a5, 4
+c.addi a5, 9
+c.add  a0, a5
+
+l.aipc  a0, 0x23456789          # 12 B: a0 = pc + 0x2345_6789
+l.auipc a0, 1                   #       a0 += 1 << 32
+
+# off = 0x1_9000_0000: lo = 0x9000_0000 is sign-extended (-0x7000_0000), so hi = 2
+l.aipc  a0, 0x90000000
+l.auipc a0, 2
+----
+
+It also adds multiples of 4{nbsp}GiB to a pointer, e.g. to select a 4{nbsp}GiB-aligned region (sandboxed heaps, per-instance memories):
+
+[source,asm]
+----
+c.li   a5, 3                    # 6 B, 1 temporary
+c.slli a5, 32
+c.add  a0, a5
+l.auipc a0, 3                   # 6 B, a0 += 3 << 32
+
+lui    a5, 0x12                 # 8 B, 1 temporary (k > 31)
+c.slli a5, 20
+c.add  a0, a5
+l.auipc a0, 0x12                # 6 B
+----
 
 [NOTE]
 ====
-The instructions replace longer sequeunces of instructions.
-
-In RV32I: up to 12 bit: addi (4B instruction); only upper 20 bit: lui (4B instruction); else: l.li (6B instruction) vs. lui (4B instruction) + addi (4B instruction)
-
-In RV64I: up to 12 bit: addiw (4B instruction); only upper 20 bit: lui (4B instruction); up to 32 bit: l.li (6B instruction) vs. lui (4B instruction) + addiw (4B instruction); else: l.li + l.lui (12B) vs. lui + addiw + 3*(slli+aadi) (total: 32B)
+L.AUIPC does not read the PC; L.ADDUI would be a more accurate name.
+`l.li` + `l.auipc` also forms any 64-bit constant (with the same `hi` adjustment), so L.LUI could be dropped to free its f2 encoding.
+Assembler and linker need new relocations for the pair (e.g. `%pcrel_lo32`/`%pcrel_hi32`, both relative to the L.AIPC).
 ====
+
+[[zl-li64]]
+===== 64-bit Constants on RV64 (under evaluation)
+
+include::images/wavedrom/zl-li64.edn[]
+
+The 64-bit forms of L.LI/L.AIPC take a 46-bit immediate (L4U-type), enough for all Sv48 addresses and most masks. The assembler picks the shortest form.
+
+[%autowidth,options="header"]
+|===
+|Option |Sequence |Bytes |Notes
+|today |`auipc` + `ld` from a constant pool |8 + 8 data |extra load
+|A: 48 + 48 |`l.li` + `l.lui` (or `l.auipc`) |12 |fusible; second instruction reads rd
+|B: 64 |`l.li` (imm46) |8 |only up to 46 bits; full 64 bits needs A
+|C: 64 + 32 |`l.li` (imm46) + new 32-bit upper-bits instruction |12 |costs a scarce 32-bit opcode; reads rd
+|D: 80 |`l.li` (imm64) |10 |single instruction, but needs the 80-bit length encoding
+|===
 
 [NOTE]
 ====
-Those instructions use up one entire OPCODE, out of 12. A 64 bit instruction might be better used, depending on the occurences of the instructions in real code.
+Pick an option based on data: how often 33-46-bit and full 64-bit constants (masks, bit-manipulation constants, addresses) occur.
 ====
 
+==== Integer Register-Immediate Instructions
+
+include::images/wavedrom/zl-opimm.edn[]
+[[zl-opimm]]
+
+L.ADDI, L.XORI, L.ORI and L.ANDI (funct3 as in OP-IMM) take a 26-bit sign-extended immediate.
+They match the 26-bit offsets of L.LOAD/L.STORE, so a compiler or linker can turn any long offset into an address.
+
+[source,asm]
+----
+lui    a5, %tprel_hi(v)  # 12 B
+add    a5, a5, tp, %tprel_add(v)
+addi   a0, a5, %tprel_lo(v)
+l.addi a0, tp, %tprel(v) # 6 B, ±32 MiB
+
+lui    a5, 0xff0         # 10 B, 1 temporary
+addi   a5, a5, 0xf0
+c.and  a0, a5
+l.andi a0, a0, 0xff00f0  # 6 B
+----
+
+[[zl-jal]]
 ==== Unconditional Jumps
 
 include::images/wavedrom/zl-jal.edn[]
-[[zl-jal]]
 
 include::images/wavedrom/zl-jalr.edn[]
 [[zl-jalr]]
 
+L.JAL (f3=000) has a 32-bit offset (±2{nbsp}GiB), so a call to any address in RV32 or in the RV64 medany model is one instruction.
+L.JALR (f3=001, funct3=000) jumps to `rs1 + sext(imm)` with a 23-bit immediate (±4{nbsp}MiB).
+f3=011…111 are reserved.
+
+[source,asm]
+----
+1: auipc ra, %pcrel_hi(f) # 8 B
+jalr   ra, %pcrel_lo(1b)(ra)
+l.jal  ra, f             # 6 B
+----
+
+include::images/wavedrom/zl-jalt.edn[]
+[[zl-jalt]]
+
+L.JALT rd, rs1, table (f3=010) calls through a table of XLEN-bit pointers:
+`rd = pc + 6; pc = mem[pc + (sext(off) + rs1) * XLEN/8] & ~1`.
+off counts table entries (±256{nbsp}MiB on RV64). rs1 = x0 gives a single pointer (GOT entry); rd = x0 gives a jump (tail call, jump table).
+
+[source,asm]
+----
+1: auipc a5, %pcrel_hi(tbl)  # 16 B: handler[i]()
+addi   a5, a5, %pcrel_lo(1b)
+sh3add a5, a1, a5
+c.ld   a5, 0(a5)
+c.jalr a5
+l.jalt ra, a1, tbl           # 6 B
+
+1: auipc a5, %got_pcrel_hi(f) # 10 B: call through the GOT (PIC, -fno-plt)
+ld     a5, %pcrel_lo(1b)(a5)
+c.jalr a5
+l.jalt ra, x0, f@got         # 6 B
+----
+
 [NOTE]
 ====
-The instructions use up one entire OPCODE, out of 12. The range is also rather large. Ideas: Redefine part to a function field and add variants of using the immediate (e.g., virtual functions).
+C++ virtual calls do not benefit: `c.ld` + `c.ld` + `c.jalr` is already 6{nbsp}B for vtable slots ≤ 31.
+A register-based table (`fp[i]()` with `fp` in a register, 8{nbsp}B today) would need rd, base, index and an offset, leaving only about 21 offset bits; it is not included.
+====
+
+[NOTE]
+====
+L.JALT and L.BTBL contain a load. Cores are expected to crack them into a load and an indirect jump predicted by the indirect-branch predictor.
+With Zicfilp, their targets are indirect-jump targets and need landing pads.
+====
+
+include::images/wavedrom/zl-jal64.edn[]
+[[zl-jal64]]
+
+The 64-bit L.JAL has a 47-bit offset (±128{nbsp}TiB) for large RV64 code models.
+
+[NOTE]
+====
+32-bit JAL stays unchanged. The 48-bit L.JAL covers the full RV32 address space, which embedded systems need for runtime relocation (e.g. swapped interrupt vector tables). The 64-bit L.JAL serves large RV64 code models.
 ====
 
 ==== Conditional Branches
 
+Long branches are only defined where they need fewer bytes than the best RV64GC + Zba/Zbb/Zbs + Zcb sequence, or the same number of bytes while saving a temporary register.
+All branch offsets have at least 20 bits (±1{nbsp}MiB) like JAL; farther targets use an inverted branch over L.JAL.
+Examples use `a4`/`a5` as temporaries; byte counts assume compressed branch targets within ±256{nbsp}B.
+
+===== Register-Register Branches
+
 include::images/wavedrom/zl-branches.edn[]
 [[zl-branches]]
 
+L.BEQ, L.BNE, L.BLT, L.BGE, L.BLTU and L.BGEU (funct3 as in BRANCH) compare rs1 and rs2 like their 32-bit counterparts.
+L.BEQW ... L.BGEUW (RV64 only) compare bits 31:0 only.
+L.BCALL.cc additionally writes `pc+6` to `ra` (always, even if not taken) and jumps if the condition holds.
+
+[source,asm]
+----
+bne    a0, a1, 1f        # 8 B
+jal    x0, L
+1:
+l.beq  a0, a1, L         # 6 B
+
+sext.w a4, a0            # 12 B, 2 temporaries
+sext.w a5, a1
+blt    a4, a5, L
+l.bltw a0, a1, L         # 6 B
+
+bgeu   sp, t0, 1f        # 8 B (stack check)
+jal    ra, morestack
+1:
+l.bcall.ltu sp, t0, morestack   # 6 B
+----
+
+===== Bit, Mask and Byte Tests
+
+include::images/wavedrom/zl-branch-test.edn[]
+[[zl-branch-test]]
+
+[%autowidth,options="header"]
+|===
+|funct6 |funct3 |Instruction |Branch if
+.6+|000010 |000 |L.BTNONE rs1, rs2 |`(rs1 & rs2) == 0`
+|001 |L.BTANY rs1, rs2 |`(rs1 & rs2) != 0`
+|010 |L.BTALL rs1, rs2 |`(rs1 & rs2) == rs2`
+|011 |L.BTNALL rs1, rs2 |`(rs1 & rs2) != rs2`
+|100 |L.BBCR rs1, rs2 |bit `rs2[5:0]` of rs1 is 0
+|101 |L.BBSR rs1, rs2 |bit `rs2[5:0]` of rs1 is 1
+.4+|000011 |000 |L.BEQB rs1, rs2 |any byte of rs1 equals `rs2[7:0]`
+|001 |L.BNEB rs1, rs2 |no byte of rs1 equals `rs2[7:0]`
+|010 |L.BEQH rs1, rs2 |any halfword of rs1 equals `rs2[15:0]`
+|011 |L.BNEH rs1, rs2 |no halfword of rs1 equals `rs2[15:0]`
+.2+|00011·idx[5] |000 |L.BBC rs1, idx |bit idx of rs1 is 0
+|001 |L.BBS rs1, idx |bit idx of rs1 is 1
+|===
+
+L.BZB/L.BNZB rs1 are pseudoinstructions for L.BEQB/L.BNEB rs1, x0.
+On RV32, idx[5] must be 0 and L.BBCR/L.BBSR use `rs2[4:0]`.
+
+[source,asm]
+----
+bexti  a5, a0, 37        # 6 B, 1 temporary
+c.bnez a5, L
+l.bbs  a0, 37, L         # 6 B
+
+c.mv   a5, a0            # 6 B, 1 temporary
+c.and  a5, a1
+c.bnez a5, L
+l.btany a0, a1, L        # 6 B
+
+li     t2, -1            # strlen: 12 B loop body, t2 live
+1: c.ld a5, 0(a0)
+orc.b  a4, a5
+c.addi a0, 8
+beq    a4, t2, 1b
+
+1: c.ld a5, 0(a0)        # 10 B loop body, no constant
+c.addi a0, 8
+l.bnzb a5, 1b
+----
+
+===== Overflow Branches
+
+include::images/wavedrom/zl-branch-ovf.edn[]
+[[zl-branch-ovf]]
+
+The instruction writes the result to rd and branches if it overflowed.
+funct3: 000 L.ADDBO (signed), 001 L.SUBBO (signed), 010 L.ADDBOU (carry), 011 L.SUBBOU (borrow), 100 L.ADDWBO, 101 L.SUBWBO (RV64 only, 32-bit signed, result sign-extended), 110 L.MULBO (low XLEN bits, branch if the full signed product does not fit), 111 reserved.
+
+[source,asm]
+----
+add    a5, a0, a1        # 16 B, 2 extra temporaries
+slti   a4, a1, 0
+slt    a3, a5, a0
+bne    a4, a3, L
+l.addbo a5, a0, a1, L    # 6 B
+
+c.mv   a5, a0            # 8 B
+c.add  a5, a1
+bltu   a5, a0, L
+l.addbou a5, a0, a1, L   # 6 B
+----
+
 [NOTE]
 ====
-A range of 1M is large enough probably, so that we can make use of the opcode space in other ways.
+L.MULBO requires the upper product half and may become a separate optional extension.
+====
+
+===== Compare with Immediate
+
+include::images/wavedrom/zl-branch-imm.edn[]
+[[zl-branch-imm]]
+
+[%autowidth,options="header"]
+|===
+|funct3 |Instruction |Branch if
+|000 / 001 |L.BEQI / L.BNEI rs1, imm |`rs1 == imm` / `rs1 != imm`
+|010 / 011 |L.BTNONEI / L.BTANYI rs1, imm |`(rs1 & imm) == 0` / `!= 0`
+|100 / 101 |L.BLTI / L.BGEI rs1, imm |signed `rs1 < imm` / `>=`
+|110 / 111 |L.BLTUI / L.BGEUI rs1, imm |unsigned `rs1 < imm` / `>=`
+|===
+
+The immediate is sign-extended: 11 bits in the 48-bit form (L3BI), 24 bits in the 64-bit form (L4BI).
+The assembler selects the shorter form.
+
+[source,asm]
+----
+addi   a5, a0, -97       # 6 B, 1 temporary
+c.beqz a5, L
+l.beqi a0, 97, L         # 6 B
+
+lui    a5, 244           # 12 B
+addiw  a5, a5, 576
+beq    a0, a5, L
+l.beqi a0, 1000000, L    # 8 B
+
+lui    a5, 0x70f         # 12 B
+addiw  a5, a5, 0xf0
+c.and  a5, a0
+c.bnez a5, L
+l.btanyi a0, 0x70f0f0, L # 8 B
+----
+
+[NOTE]
+====
+If the operand is dead, `c.addi` + `c.beqz` (4 B) remains shorter than L.BEQI.
+====
+
+[NOTE]
+====
+Open trade-off for L4BI: a 32-bit immediate (full 32-bit constants and RV32 addresses) leaves only a 12-bit offset; this proposal keeps the 20-bit offset and limits the immediate to 24 bits.
+Data on compared constants should decide.
+====
+
+===== Field, Range and Table Branches
+
+include::images/wavedrom/zl-branch-ext.edn[]
+[[zl-branch-ext]]
+
+All use the 64-bit BRANCH-EXT64 major opcode:
+
+[%autowidth,options="header"]
+|===
+|funct3 |Instruction |Operation
+|000 / 001 |L.BFEQI / L.BFNEI rs1, pos, len, imm |branch if `rs1[pos+len-1:pos]` equals / differs from `sext(imm)[len-1:0]` (imm 12 bits)
+|100 / 101 |L.BRNG / L.BRNG.INV rs1, lo, hi |branch if `lo <= rs1 <= hi` / outside, signed (lo sign-extended, `hi - lo` ≤ 255)
+|110 / 111 |L.BRNGU / L.BRNGU.INV rs1, lo, hi |same, unsigned (lo zero-extended)
+|010 |L.BTBL rs1, bias, bound, table, size |`i = rs1 - sext(bias)` (bias 12 bits); if `i <u bound` (bound ≤ 1023), load the signed `size`-byte entry `e` from `table + i*size` and jump to `pc + (e << 1)`; else fall through. `table = pc + off`; size 1, 2, 4 B is encoded in esize as 00, 01, 10 (11 reserved)
+|011 |_reserved_ |
+|===
+
+`pos + len > XLEN` is reserved. The L.BTBL table can stay in `.rodata`; its entries are relative to the L.BTBL.
+
+[source,asm]
+----
+srli   a5, a0, 47        # 14 B, NaN-box tag check
+lui    a4, 0x20
+c.addiw a4, -15
+bne    a5, a4, L
+l.bfnei a0, 47, 17, -15, L       # 8 B
+
+addi   a5, a0, -48       # 10 B, isdigit
+sltiu  a5, a5, 10
+c.bnez a5, L
+l.brngu a0, '0', '9', L  # 8 B
+
+addi   a5, a0, -LO       # 28 B, dense switch
+sltiu  a4, a5, N
+c.beqz a4, default
+auipc  a4, %pcrel_hi(tbl)
+addi   a4, a4, %pcrel_lo(...)
+sh2add a5, a5, a4
+c.lw   a5, 0(a5)
+c.add  a5, a4
+c.jr   a5
+l.btbl a0, LO, N, tbl, 2 # 10 B, table entries 2 B instead of 4 B
+c.j    default
+----
+
+[NOTE]
+====
+Not included, because they are larger or only equal without saving a register: loop branches (`c.addi` + `c.bnez` is 4 B), load-compare-branch, conditional return, the predication hint and immediate W compares.
 ====
 
 ==== Load and Store Instructions
@@ -102,4 +475,44 @@ A range of 1M is large enough probably, so that we can make use of the opcode sp
 include::images/wavedrom/zl-load-store.edn[]
 [[zl-load-store]]
 
-l.load and l.store allow for rd +/- 16M accesses.
+L.LB…L.LD and L.LBU…L.LWU use L3I-type, L.SB…L.SD use L3S-type; width is encoded as in LOAD/STORE.
+Both take a 26-bit offset (±32{nbsp}MiB).
+
+[source,asm]
+----
+lui    a5, 0x2           # 10 B (frame > 2 KiB)
+c.add  a5, sp
+ld     a0, -1736(a5)
+l.ld   a0, 6456(sp)      # 6 B
+----
+
+[NOTE]
+====
+Base-relative long loads and stores on symbols (GP-, TP-relative) come from linker relaxation, because the compiler does not know the offset (see <<Compiler and Linker Usage>>).
+This needs new relocations, and L.ADDI so the same offset can also be computed into a register.
+====
+
+===== PC-Relative Loads and Stores
+
+include::images/wavedrom/zl-load-store-pc.edn[]
+[[zl-load-store-pc]]
+
+The LS-PC major opcode accesses `pc + sext(off)` (±512{nbsp}MiB). S=0: load into rd, funct3 as in LOAD. S=1: store rs2 (in the rd field), funct3 as in STORE.
+The assembler uses this form for `l.ld rd, sym` / `l.sd rs2, sym`.
+
+[source,asm]
+----
+1: auipc a5, %pcrel_hi(v)    # 8 B, 1 temporary
+ld     a0, %pcrel_lo(1b)(a5)
+l.ld   a0, v                 # 6 B
+
+1: auipc a5, %pcrel_hi(v)    # 8 B, 1 temporary
+sd     a1, %pcrel_lo(1b)(a5)
+l.sd   a1, v                 # 6 B
+----
+
+[NOTE]
+====
+This saves 2{nbsp}B on every access to a global in medany/PIC code.
+The 48-bit offset reaches ±512{nbsp}MiB, not the ±2{nbsp}GiB of medany, so the compiler emits a 64-bit form (to be defined) and the linker relaxes it to 48 bits.
+====

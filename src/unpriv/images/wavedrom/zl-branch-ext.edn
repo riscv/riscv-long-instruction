@@ -1,0 +1,63 @@
+//Zl long instruction encodings (generated layout, see zl.adoc).
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 5, name: '11111'},
+  {bits: 2, name: 'op', attr: ['2', 'BRANCH-EXT64']},
+  {bits: 1, name: '[11]'},
+  {bits: 4, name: 'off[4:1]'},
+  {bits: 3, name: 'funct3', attr: ['3', 'L.BFEQI/L.BFNEI']},
+  {bits: 5, name: 'rs1', attr: ['5', 'src']},
+  {bits: 11, name: 'imm[10:0]'},
+  {bits: 1, name: '[20]'},
+  {bits: 2, name: '11'},
+  {bits: 3, name: 'op', attr: ['3', 'BRANCH-EXT64']},
+  {bits: 6, name: 'off[10:5]'},
+  {bits: 8, name: 'off[19:12]'},
+  {bits: 6, name: 'pos'},
+  {bits: 6, name: 'len-1'},
+  {bits: 1, name: '[11]'},
+], config: {lanes: 2, fontsize: 11}}
+....
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 5, name: '11111'},
+  {bits: 2, name: 'op', attr: ['2', 'BRANCH-EXT64']},
+  {bits: 1, name: '[11]'},
+  {bits: 4, name: 'off[4:1]'},
+  {bits: 3, name: 'funct3', attr: ['3', 'L.BRNG[U][.INV]']},
+  {bits: 5, name: 'rs1', attr: ['5', 'src']},
+  {bits: 11, name: 'lo[10:0]'},
+  {bits: 1, name: '[20]'},
+  {bits: 2, name: '11'},
+  {bits: 3, name: 'op', attr: ['3', 'BRANCH-EXT64']},
+  {bits: 6, name: 'off[10:5]'},
+  {bits: 8, name: 'off[19:12]'},
+  {bits: 8, name: 'hi-lo'},
+  {bits: 5, name: 'lo[15:11]'},
+], config: {lanes: 2, fontsize: 11}}
+....
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 5, name: '11111'},
+  {bits: 2, name: 'op', attr: ['2', 'BRANCH-EXT64']},
+  {bits: 1, name: '[11]'},
+  {bits: 4, name: 'off[4:1]'},
+  {bits: 3, name: 'funct3', attr: ['3', 'L.BTBL']},
+  {bits: 5, name: 'rs1', attr: ['5', 'src']},
+  {bits: 11, name: 'bias[10:0]'},
+  {bits: 1, name: '[20]'},
+  {bits: 2, name: '11'},
+  {bits: 3, name: 'op', attr: ['3', 'BRANCH-EXT64']},
+  {bits: 6, name: 'off[10:5]'},
+  {bits: 8, name: 'off[19:12]'},
+  {bits: 2, name: 'es', attr: ['2', 'esize']},
+  {bits: 10, name: 'bound'},
+  {bits: 1, name: '[11]'},
+], config: {lanes: 2, fontsize: 11}}
+....

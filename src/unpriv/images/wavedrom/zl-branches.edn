@@ -1,20 +1,19 @@
-//FROM ## 2.4 Integer Computational Instructions
-//### Integer Register-Immediate Instructions
-//lui-aiupc-u-immed
+//Zl long instruction encodings (generated layout, see zl.adoc).
 
 [wavedrom, ,svg]
 ....
 {reg: [
-  {bits: 5,  name: '11111',      attr: ['5', '']},
-  {bits: 2,  name: 'op',         attr: ['2', 'OP']},
-  {bits: 1,  name: 'imm[11]',    attr: ['1', '', '', '', '']},
-  {bits: 4,  name: 'imm[4:1]',   attr: ['4', 'offset[4:1]', 'offset[4:1]', 'offset[4:1]', 'offset[4:1]']},
-  {bits: 3,  name: 'funct3',     attr: ['3', 'L.BEQ/L.BNE', 'L.BLT[U]', 'L.BGE[U]']},
-  {bits: 5,  name: 'rs1',        attr: ['5', 'rs1', 'rs1', 'rs1', 'rs1']},
-  {bits: 5,  name: 'rs2',        attr: ['5', 'rs2', 'rs2', 'rs2', 'rs2']},
-  {bits: 6,  name: 'imm[10:5]',  attr: ['7', 'offset[11:5]', 'offset[11:5]', 'offset[11:5]', 'offset[11:5]']},
-  {bits: 1,  name: 'imm[12]',    attr: ['1', '', '', '', '']},
-  {bits: 2,  name: 'op',         attr: ['2', 'OP', 'OP', 'OP', 'OP']},
-  {bits: 14, name: 'imm[26:13]', attr: ['14', 'offset[25:12]', 'offset[25:12]', 'offset[25:12]', 'offset[25:12]']},
-], config: {fontsize: 11 }}
+  {bits: 5, name: '11111'},
+  {bits: 2, name: 'op', attr: ['2', 'BRANCH', 'BRANCH', 'BRANCH']},
+  {bits: 1, name: '[11]'},
+  {bits: 4, name: 'off[4:1]'},
+  {bits: 3, name: 'funct3', attr: ['3', 'L.Bcc', 'L.BccW', 'L.BCALL.cc']},
+  {bits: 5, name: 'rs1', attr: ['5', 'src1', 'src1', 'src1']},
+  {bits: 5, name: 'rs2', attr: ['5', 'src2', 'src2', 'src2']},
+  {bits: 6, name: 'off[10:5]'},
+  {bits: 1, name: '[20]'},
+  {bits: 2, name: 'op', attr: ['2', 'BRANCH', 'BRANCH', 'BRANCH']},
+  {bits: 6, name: 'funct6', attr: ['6', '000000', '000001', '000100']},
+  {bits: 8, name: 'off[19:12]'},
+], config: {fontsize: 11}}
 ....

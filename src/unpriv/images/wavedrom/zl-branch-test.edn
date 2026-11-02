@@ -1,0 +1,38 @@
+//Zl long instruction encodings (generated layout, see zl.adoc).
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 5, name: '11111'},
+  {bits: 2, name: 'op', attr: ['2', 'BRANCH', 'BRANCH']},
+  {bits: 1, name: '[11]'},
+  {bits: 4, name: 'off[4:1]'},
+  {bits: 3, name: 'funct3', attr: ['3', 'L.BT*/L.BB*R', 'L.B[N]EQ[B/H]']},
+  {bits: 5, name: 'rs1', attr: ['5', 'src', 'src']},
+  {bits: 5, name: 'rs2', attr: ['5', 'mask/index', 'byte/half']},
+  {bits: 6, name: 'off[10:5]'},
+  {bits: 1, name: '[20]'},
+  {bits: 2, name: 'op', attr: ['2', 'BRANCH', 'BRANCH']},
+  {bits: 6, name: 'funct6', attr: ['6', '000010', '000011']},
+  {bits: 8, name: 'off[19:12]'},
+], config: {fontsize: 11}}
+....
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 5, name: '11111'},
+  {bits: 2, name: 'op', attr: ['2', 'BRANCH']},
+  {bits: 1, name: '[11]'},
+  {bits: 4, name: 'off[4:1]'},
+  {bits: 3, name: 'funct3', attr: ['3', 'L.BBC/L.BBS']},
+  {bits: 5, name: 'rs1', attr: ['5', 'src']},
+  {bits: 5, name: 'idx[4:0]', attr: ['5', 'index[4:0]']},
+  {bits: 6, name: 'off[10:5]'},
+  {bits: 1, name: '[20]'},
+  {bits: 2, name: 'op', attr: ['2', 'BRANCH']},
+  {bits: 1, name: '[5]', attr: ['1', 'index[5]']},
+  {bits: 5, name: 'funct5', attr: ['5', '00011']},
+  {bits: 8, name: 'off[19:12]'},
+], config: {fontsize: 11}}
+....

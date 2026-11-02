@@ -1,14 +1,17 @@
+//Zl long instruction encodings (generated layout, see zl.adoc).
+
 [wavedrom, ,svg]
 ....
 {reg: [
-  {bits: 5,  name: '11111',      attr: ['5', '']},
-  {bits: 2,  name: 'op',         attr: ['2', 'OP']},
-  {bits: 5,  name: 'rd',         attr: ['5', 'dest']},
-  {bits: 8,  name: 'imm[19:12]', attr: ['8', 'LJ-immediate[19:12]']},
-  {bits: 1,  name: '[11]',       attr: ['1', '']},
-  {bits: 10, name: 'imm[10:1]',  attr: ['10', 'LJ-immediate[10:1]']},
-  {bits: 1,  name: '[20]',       attr: ['1', '']},
-  {bits: 2, name: 'op',          attr: ['2', 'OP']},
-  {bits: 14, name: 'imm[34:21]', attr: ['14', 'LJ-immediate[34:21]']},
-], config: {fontsize: 11 }}
+  {bits: 5, name: '11111'},
+  {bits: 2, name: 'op', attr: ['2', 'JUMP']},
+  {bits: 5, name: 'rd', attr: ['5', 'dest']},
+  {bits: 8, name: 'off[19:12]'},
+  {bits: 1, name: '[11]'},
+  {bits: 10, name: 'off[10:1]'},
+  {bits: 1, name: '[31]'},
+  {bits: 2, name: 'op', attr: ['2', 'JUMP']},
+  {bits: 11, name: 'off[30:20]'},
+  {bits: 3, name: 'f3', attr: ['3', '000 (L.JAL)']},
+], config: {fontsize: 11}}
 ....

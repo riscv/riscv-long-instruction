@@ -1,0 +1,16 @@
+//Zl long instruction encodings (generated layout, see zl.adoc).
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 5, name: '11111'},
+  {bits: 2, name: 'op', attr: ['2', 'LS-PC', 'LS-PC']},
+  {bits: 5, name: 'rd/rs2', attr: ['5', 'dest', 'src']},
+  {bits: 3, name: 'funct3', attr: ['3', 'width', 'width']},
+  {bits: 1, name: 'S', attr: ['1', '0', '1']},
+  {bits: 15, name: 'off[14:0]'},
+  {bits: 1, name: '[29]'},
+  {bits: 2, name: 'op', attr: ['2', 'LS-PC', 'LS-PC']},
+  {bits: 14, name: 'off[28:15]'},
+], config: {fontsize: 11}}
+....

@@ -1,27 +1,71 @@
-//RISC-V long instruction encodings.
+//Zl long instruction encodings (generated layout, see zl.adoc).
 
 [wavedrom, ,svg]
 ....
 {reg: [
-  {bits: 12, name: 'imm[11:0]'},
-  {bits: 14, name: 'imm[25:12]'},
-  {bits: 6, name: 'imm[25]'},
-], config: {label: {right: 'LI-immediate'}}}
+  {bits: 11, name: 'inst[30:20]'},
+  {bits: 14, name: 'inst[47:34]'},
+  {bits: 7, name: '— inst[31] —'},
+], config: {fontsize: 11, label: {right: 'L3I-immediate'}}}
 ....
 
 [wavedrom, ,svg]
 ....
 {reg: [
-  {bits: 18, name: 'imm[17:0]'},
-  {bits: 14, name: 'imm[31:18]'},
-], config: {label: {right: 'LU-immediate'}}}
+  {bits: 5, name: 'inst[11:7]'},
+  {bits: 6, name: 'inst[30:25]'},
+  {bits: 14, name: 'inst[47:34]'},
+  {bits: 7, name: '— inst[31] —'},
+], config: {fontsize: 11, label: {right: 'L3S-immediate'}}}
 ....
 
 [wavedrom, ,svg]
 ....
 {reg: [
   {bits: 1, name: '0'},
-  {bits: 20, name: 'imm[20:1]'},
-  {bits: 11, name: 'imm[31:21]'},
-], config: {label: {right: 'LJ-immediate'}}}
+  {bits: 4, name: 'inst[11:8]'},
+  {bits: 6, name: 'inst[30:25]'},
+  {bits: 1, name: '[7]'},
+  {bits: 8, name: 'inst[47:40]'},
+  {bits: 12, name: '— inst[31] —'},
+], config: {fontsize: 11, label: {right: 'L3B-immediate'}}}
+....
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 12, name: 'inst[47:36]'},
+  {bits: 20, name: 'inst[31:12]'},
+], config: {fontsize: 11, label: {right: 'L3U-immediate'}}}
+....
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 1, name: '0'},
+  {bits: 10, name: 'inst[30:21]'},
+  {bits: 1, name: '[20]'},
+  {bits: 8, name: 'inst[19:12]'},
+  {bits: 11, name: 'inst[44:34]'},
+  {bits: 1, name: '[31]'},
+], config: {fontsize: 11, label: {right: 'L3J-immediate'}}}
+....
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 3, name: 'inst[14:12]'},
+  {bits: 11, name: 'inst[30:20]'},
+  {bits: 11, name: 'inst[44:34]'},
+  {bits: 7, name: '— inst[31] —'},
+], config: {fontsize: 11, label: {right: 'L3JT-offset (entries)'}}}
+....
+
+[wavedrom, ,svg]
+....
+{reg: [
+  {bits: 15, name: 'inst[30:16]'},
+  {bits: 14, name: 'inst[47:34]'},
+  {bits: 3, name: '[31]'},
+], config: {fontsize: 11, label: {right: 'L3P-offset'}}}
 ....
